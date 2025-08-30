@@ -170,6 +170,9 @@ class CreateElectronReactApp {
       const templatePath = path.join(__dirname, 'template');
       await fs.copy(templatePath, projectPath);
 
+      // Remove template-specific files
+      await this.removeTemplateFiles(projectPath);
+
       // Handle welcome kit choice
       if (!config.welcomeKit) {
         await this.removeWelcomeKit(projectPath);
@@ -193,9 +196,34 @@ class CreateElectronReactApp {
     const packageJson = await fs.readJson(packageJsonPath);
 
     packageJson.name = projectName;
+    packageJson.version = '1.0.0';
     packageJson.description = `A modern Electron application built with ${projectName}`;
 
     await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
+  }
+
+  private async removeTemplateFiles(projectPath: string) {
+    try {
+      // Remove template-specific preview image
+      const previewImagePath = path.join(projectPath, 'app', 'assets', 'era-preview.png');
+      if (await fs.pathExists(previewImagePath)) {
+        await fs.remove(previewImagePath);
+      }
+
+      // Remove template-specific CHANGELOG
+      const changelogPath = path.join(projectPath, 'CHANGELOG.md');
+      if (await fs.pathExists(changelogPath)) {
+        await fs.remove(changelogPath);
+      }
+
+      // Remove template README
+      const readmePath = path.join(projectPath, 'README.md');
+      if (await fs.pathExists(readmePath)) {
+        await fs.remove(readmePath);
+      }
+    } catch (error) {
+      console.warn('Warning: Could not remove template files:', (error as Error).message);
+    }
   }
 
   private async removeWelcomeKit(projectPath: string) {
