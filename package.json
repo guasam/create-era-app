@@ -54,7 +54,8 @@
     "eslint": "^9.34.0"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run copy-template",
+    "copy-template": "cp -r template dist/",
     "dev": "tsc --watch",
     "prepublishOnly": "npm run build",
     "format": "prettier --write .",

@@ -15,14 +15,12 @@ const __dirname = path.dirname(__filename);
 
 interface CreateOptions {
   name?: string;
-  template?: string;
   yes?: boolean;
   git?: boolean;
   install?: boolean;
 }
 
 interface ProjectConfig {
-  template: string;
   git: boolean;
   install: boolean;
   packageManager: string;
@@ -42,7 +40,6 @@ class CreateElectronReactApp {
       .description('Create a modern Electron app with React, TypeScript, and TailwindCSS')
       .version('1.0.0')
       .argument('[name]', 'Project name')
-      .option('-t, --template <template>', 'Template to use (default: default)')
       .option('-y, --yes', 'Skip prompts and use defaults')
       .option('--no-git', 'Skip git initialization')
       .option('--no-install', 'Skip dependency installation')
@@ -105,24 +102,13 @@ class CreateElectronReactApp {
   private async getConfig(options: CreateOptions): Promise<ProjectConfig> {
     if (options.yes) {
       return {
-        template: options.template || 'default',
         git: options.git !== false,
         install: options.install !== false,
         packageManager: 'npm',
       };
     }
 
-    const { template, git, install, packageManager } = await inquirer.prompt([
-      {
-        type: 'list',
-        name: 'template',
-        message: 'Which template would you like to use?',
-        choices: [
-          { name: 'Default (React + TypeScript + TailwindCSS + Shadcn)', value: 'default' },
-          { name: 'Minimal (React + TypeScript)', value: 'minimal' },
-        ],
-        default: options.template || 'default',
-      },
+    const { git, install, packageManager } = await inquirer.prompt([
       {
         type: 'confirm',
         name: 'git',
@@ -150,7 +136,7 @@ class CreateElectronReactApp {
       },
     ]);
 
-    return { template, git, install, packageManager };
+    return { git, install, packageManager };
   }
 
   private async generateProject(projectName: string, projectPath: string, config: ProjectConfig) {
@@ -158,7 +144,7 @@ class CreateElectronReactApp {
 
     try {
       // Copy template
-      const templatePath = path.join(__dirname, '..', 'template');
+      const templatePath = path.join(__dirname, 'template');
       await fs.copy(templatePath, projectPath);
 
       // Update package.json
@@ -185,18 +171,26 @@ class CreateElectronReactApp {
   }
 
   private async replaceProjectName(projectPath: string, projectName: string) {
-    const files = await glob('**/*', {
-      cwd: projectPath,
-      ignore: ['node_modules/**', 'dist/**', 'out/**', '.git/**', '*.log'],
-    });
+    try {
+      const files = await glob('**/*', {
+        cwd: projectPath,
+        ignore: ['node_modules/**', 'dist/**', 'out/**', '.git/**', '*.log'],
+        nodir: true, // Only include files, not directories
+      });
 
-    const options = {
-      files: files.map((file) => path.join(projectPath, file)),
-      from: [/era/g, /ElectronReactApp/g, /electron-react-app/g],
-      to: [projectName, projectName.charAt(0).toUpperCase() + projectName.slice(1), projectName],
-    };
+      if (files.length > 0) {
+        const options = {
+          files: files.map((file) => path.join(projectPath, file)),
+          from: [/era/g, /ElectronReactApp/g, /electron-react-app/g],
+          to: [projectName, projectName.charAt(0).toUpperCase() + projectName.slice(1), projectName],
+        };
 
-    await replace(options);
+        await replace(options);
+      }
+    } catch (error) {
+      // If replace fails, continue without it
+      console.warn('Warning: Could not replace project names in files:', (error as Error).message);
+    }
   }
 
   private async postCreate(projectPath: string, config: ProjectConfig) {
