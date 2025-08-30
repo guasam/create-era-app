@@ -54,6 +54,7 @@
     "eslint": "^9.34.0"
   },
   "scripts": {
+    "test": "node dist/index.js",
     "build": "tsc && npm run copy-template",
     "copy-template": "cp -r template dist/",
     "dev": "tsc --watch",

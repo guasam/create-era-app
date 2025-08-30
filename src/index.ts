@@ -24,6 +24,7 @@ interface ProjectConfig {
   git: boolean;
   install: boolean;
   packageManager: string;
+  welcomeKit: boolean;
 }
 
 class CreateElectronReactApp {
@@ -120,10 +121,11 @@ class CreateElectronReactApp {
         git: options.git !== false,
         install: options.install !== false,
         packageManager: 'npm',
+        welcomeKit: true,
       };
     }
 
-    const { git, install, packageManager } = await inquirer.prompt([
+    const { git, install, packageManager, welcomeKit } = await inquirer.prompt([
       {
         type: 'confirm',
         name: 'git',
@@ -149,9 +151,15 @@ class CreateElectronReactApp {
         default: 'npm',
         when: (answers) => answers.install,
       },
+      {
+        type: 'confirm',
+        name: 'welcomeKit',
+        message: 'Include interactive project showcase demo?',
+        default: true,
+      },
     ]);
 
-    return { git, install, packageManager };
+    return { git, install, packageManager, welcomeKit };
   }
 
   private async generateProject(projectName: string, projectPath: string, config: ProjectConfig) {
@@ -161,6 +169,13 @@ class CreateElectronReactApp {
       // Copy template
       const templatePath = path.join(__dirname, 'template');
       await fs.copy(templatePath, projectPath);
+
+      // Handle welcome kit choice
+      if (!config.welcomeKit) {
+        await this.removeWelcomeKit(projectPath);
+      }
+
+
 
       // Update package.json
       await this.updatePackageJson(projectPath, projectName);
@@ -185,18 +200,58 @@ class CreateElectronReactApp {
     await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
   }
 
+
+
+  private async removeWelcomeKit(projectPath: string) {
+    try {
+      // Remove welcome kit directory
+      const welcomeKitPath = path.join(projectPath, 'app', 'components', 'welcome');
+      await fs.remove(welcomeKitPath);
+
+      // Update app.tsx to remove welcome kit import and usage
+      const appTsxPath = path.join(projectPath, 'app', 'app.tsx');
+      const appContent = await fs.readFile(appTsxPath, 'utf-8');
+
+      // Remove welcome kit import and replace with a simple app structure
+      const newAppContent = `import './styles/app.css'
+
+export default function App() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold text-foreground mb-4">
+          Welcome to your Electron App!
+        </h1>
+        <p className="text-muted-foreground">
+          Start building your desktop application.
+        </p>
+      </div>
+    </div>
+  )
+}`;
+
+      await fs.writeFile(appTsxPath, newAppContent);
+    } catch (error) {
+      console.warn('Warning: Could not remove welcome kit:', (error as Error).message);
+    }
+  }
+
   private async replaceProjectName(projectPath: string, projectName: string) {
     try {
       const files = await glob('**/*', {
         cwd: projectPath,
-        ignore: ['node_modules/**', 'dist/**', 'out/**', '.git/**', '*.log'],
+        ignore: ['node_modules/**', 'dist/**', 'out/**', '.git/**', '*.log', 'package.json'],
         nodir: true, // Only include files, not directories
       });
 
       if (files.length > 0) {
         const options = {
           files: files.map((file) => path.join(projectPath, file)),
-          from: [/era/g, /ElectronReactApp/g, /electron-react-app/g],
+          from: [
+            /\bera\b(?!\.svg)/g, // Word boundary for "era" but not followed by .svg
+            /\bElectronReactApp\b/g, // Word boundary for "ElectronReactApp"
+            /\belectron-react-app\b/g // Word boundary for "electron-react-app"
+          ],
           to: [projectName, projectName.charAt(0).toUpperCase() + projectName.slice(1), projectName],
         };
 
