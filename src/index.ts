@@ -28,10 +28,22 @@ interface ProjectConfig {
 
 class CreateElectronReactApp {
   private program: Command;
+  private templateVersion: string;
 
   constructor() {
     this.program = new Command();
+    this.templateVersion = this.getTemplateVersion();
     this.setupCommands();
+  }
+
+  private getTemplateVersion(): string {
+    try {
+      const templatePackagePath = path.join(__dirname, 'template', 'package.json');
+      const templatePackage = fs.readJsonSync(templatePackagePath);
+      return templatePackage.version;
+    } catch (error) {
+      return 'unknown';
+    }
   }
 
   private setupCommands() {
@@ -53,6 +65,9 @@ class CreateElectronReactApp {
   private async createApp(name?: string, options: CreateOptions = {}) {
     try {
       console.log(chalk.blue.bold('\n🚀 Create Electron React App\n'));
+
+      // Show template version as first step
+      console.log(chalk.cyan('📦 Framework version:'), chalk.white(`v${this.templateVersion}`));
 
       // Get project name
       const projectName = name || (await this.getProjectName());
