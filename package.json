@@ -1,0 +1,65 @@
+{
+  "name": "create-era-app",
+  "version": "1.0.0",
+  "description": "Create a modern Electron app with React, TypeScript, and TailwindCSS",
+  "main": "dist/index.js",
+  "type": "module",
+  "bin": {
+    "create-era-app": "./bin/cli.js"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "template"
+  ],
+  "keywords": [
+    "electron",
+    "react",
+    "typescript",
+    "vite",
+    "tailwindcss",
+    "shadcn",
+    "cli",
+    "generator",
+    "create-app"
+  ],
+  "author": "Guasam",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guasam/create-electron-react-app"
+  },
+  "homepage": "https://github.com/guasam/create-electron-react-app",
+  "bugs": {
+    "url": "https://github.com/guasam/create-electron-react-app/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "inquirer": "^9.2.15",
+    "ora": "^8.0.1",
+    "fs-extra": "^11.2.0",
+    "glob": "^10.3.10",
+    "replace-in-file": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^24.3.0",
+    "typescript": "^5.9.2",
+    "prettier": "^3.6.2",
+    "eslint": "^9.34.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build",
+    "format": "prettier --write .",
+    "lint": "eslint . --ext .ts,.js",
+    "setup-template": "bash scripts/setup-template.sh",
+    "publish-cli": "bash scripts/publish.sh"
+  }
+}
