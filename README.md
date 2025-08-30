@@ -1,4 +1,4 @@
-# create-electron-react-app
+# create-era-app
 
 A CLI tool to quickly create modern Electron applications with React, TypeScript, Vite, and TailwindCSS.
 
@@ -6,10 +6,10 @@ A CLI tool to quickly create modern Electron applications with React, TypeScript
 
 ```bash
 # Create a new project
-npx create-electron-react-app my-app
+npx create-era-app my-app
 
 # Or with specific options
-npx create-electron-react-app my-app --yes --no-git
+npx create-era-app my-app --yes --no-git
 ```
 
 

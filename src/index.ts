@@ -49,7 +49,7 @@ class CreateElectronReactApp {
 
   private setupCommands() {
     this.program
-      .name('create-electron-react-app')
+      .name('create-era-app')
       .description('Create a modern Electron app with React, TypeScript, and TailwindCSS')
       .version('1.0.0')
       .argument('[name]', 'Project name')
