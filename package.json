@@ -1,6 +1,6 @@
 {
   "name": "create-era-app",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Create a modern Electron app with React, TypeScript, and TailwindCSS",
   "main": "dist/index.js",
   "type": "module",
