@@ -175,8 +175,6 @@ class CreateElectronReactApp {
         await this.removeWelcomeKit(projectPath);
       }
 
-
-
       // Update package.json
       await this.updatePackageJson(projectPath, projectName);
 
@@ -200,8 +198,6 @@ class CreateElectronReactApp {
     await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
   }
 
-
-
   private async removeWelcomeKit(projectPath: string) {
     try {
       // Remove welcome kit directory
@@ -217,15 +213,9 @@ class CreateElectronReactApp {
 
 export default function App() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-foreground mb-4">
-          Welcome to your Electron App!
-        </h1>
-        <p className="text-muted-foreground">
-          Start building your desktop application.
-        </p>
-      </div>
+    <div className="flex flex-col items-center justify-center text-center max-w-md mx-auto px-4">
+      <h1 className="text-4xl font-bold text-foreground mb-4">Welcome to your Electron App!</h1>
+      <p className="text-muted-foreground text-lg">Start building your desktop application.</p>
     </div>
   )
 }`;
@@ -250,7 +240,7 @@ export default function App() {
           from: [
             /\bera\b(?!\.svg)/g, // Word boundary for "era" but not followed by .svg
             /\bElectronReactApp\b/g, // Word boundary for "ElectronReactApp"
-            /\belectron-react-app\b/g // Word boundary for "electron-react-app"
+            /\belectron-react-app\b/g, // Word boundary for "electron-react-app"
           ],
           to: [projectName, projectName.charAt(0).toUpperCase() + projectName.slice(1), projectName],
         };
